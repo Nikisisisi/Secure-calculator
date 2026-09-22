@@ -372,7 +372,7 @@ POST /calculate/power
 Текущая версия приложения:
 
 <!-- VERSION:START -->
-`1.0.3`
+`1.0.4`
 <!-- VERSION:END -->
 
 ---
