@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Secure Calculator</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                135deg,
+                #0f172a,
+                #1e293b,
+                #0f766e
+            );
+
+            color: white;
+        }
+
+        .calculator {
+            width: 360px;
+
+            padding: 35px;
+
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, 0.10);
+
+            backdrop-filter: blur(10px);
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.5);
+
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .author {
+            opacity: 0.8;
+            margin-bottom: 25px;
+        }
+
+        input {
+            box-sizing: border-box;
+
+            width: 100%;
+
+            margin-top: 10px;
+
+            padding: 12px;
+
+            border: none;
+            border-radius: 10px;
+
+            font-size: 16px;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            width: 60px;
+            height: 45px;
+
+            margin: 5px;
+
+            border: none;
+            border-radius: 10px;
+
+            font-size: 20px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            transform: scale(1.08);
+        }
+
+        #result {
+            margin-top: 25px;
+
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .version {
+            margin-top: 25px;
+
+            font-size: 13px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="calculator">
+
+    <h1> Secure Calculator</h1>
+
+    <div class="author">
+        Автор: Обухов Н. и Лапшина Д.
+    </div>
+
+    <input
+        id="a"
+        type="number"
+        step="any"
+        placeholder="Первое число"
+    >
+
+    <input
+        id="b"
+        type="number"
+        step="any"
+        placeholder="Второе число"
+    >
+
+    <div class="buttons">
+
+        <button onclick="calculate('add')">
+            +
+        </button>
+
+        <button onclick="calculate('subtract')">
+            −
+        </button>
+
+        <button onclick="calculate('multiply')">
+            ×
+        </button>
+
+        <button onclick="calculate('divide')">
+            ÷
+        </button>
+
+    </div>
+
+    <div id="result">
+        Результат: —
+    </div>
+
+    <div class="version">
+        Secure Calculator API v1.0.0
+    </div>
+
+</div>
+
+
+<script>
+
+async function calculate(operation) {
+
+    const a =
+        Number(document.getElementById("a").value);
+
+    const b =
+        Number(document.getElementById("b").value);
+
+
+    const response = await fetch(
+        `/calculate/${operation}`,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                a: a,
+                b: b
+            })
+        }
+    );
+
+
+    const data = await response.json();
+
+
+    if (response.ok) {
+
+        document.getElementById("result").textContent =
+            "Результат: " + data.result;
+
+    } else {
+
+        document.getElementById("result").textContent =
+            "Ошибка: " + data.detail;
+
+    }
+}
+
+</script>
+
+</body>
+
+</html>
