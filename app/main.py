@@ -4,11 +4,19 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
+VERSION_FILE = Path(__file__).parent.parent / "VERSION"
+
+
+def get_version():
+    return VERSION_FILE.read_text(encoding="utf-8").strip()
+
+
+APP_VERSION = get_version()
 
 app = FastAPI(
     title="Secure Calculator API",
     description="API-калькулятор для учебной работы по безопасной разработке",
-    version="1.0.0",
+    version=APP_VERSION,
 )
 
 
@@ -21,7 +29,7 @@ class CalculationRequest(BaseModel):
 def root():
     return {
         "message": "Secure Calculator API is running",
-        "version": "1.0.0"
+        "version": APP_VERSION
     }
 
 

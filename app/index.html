@@ -155,8 +155,8 @@
         Результат: —
     </div>
 
-    <div class="version">
-        Secure Calculator API v1.0.0
+    <div class="version" id="version">
+        Secure Calculator API
     </div>
 
 </div>
@@ -205,7 +205,17 @@ async function calculate(operation) {
 
     }
 }
+async function loadVersion() {
 
+    const response = await fetch("/");
+    const data = await response.json();
+
+    document.getElementById("version").textContent =
+        "Secure Calculator API v" + data.version;
+}
+
+
+loadVersion();
 </script>
 
 </body>
