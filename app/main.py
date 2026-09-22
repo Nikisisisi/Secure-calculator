@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
+
 VERSION_FILE = Path(__file__).parent.parent / "VERSION"
 
 
@@ -12,6 +13,7 @@ def get_version():
 
 
 APP_VERSION = get_version()
+
 
 app = FastAPI(
     title="Secure Calculator API",
@@ -68,3 +70,8 @@ def divide(data: CalculationRequest):
         )
 
     return {"result": data.a / data.b}
+
+
+@app.post("/calculate/power")
+def power(data: CalculationRequest):
+    return {"result": data.a ** data.b}

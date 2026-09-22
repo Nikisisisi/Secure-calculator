@@ -104,3 +104,16 @@ def test_web_interface():
 
     assert response.status_code == 200
     assert "Secure Calculator" in response.text
+
+
+def test_power():
+    response = client.post(
+        "/calculate/power",
+        json={
+            "a": 2,
+            "b": 3
+        }
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"result": 8}
