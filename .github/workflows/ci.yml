@@ -60,11 +60,32 @@ jobs:
             --redact \
             /repo
 
+      - name: Scan Docker configuration with Trivy
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/repo" \
+            aquasec/trivy:0.75.0 \
+            config \
+            --exit-code 1 \
+            /repo
+
       - name: Build Docker image
         run: |
           docker build \
             -t secure-calculator:${{ steps.version.outputs.version }} \
             .
+
+      - name: Scan Docker image with Trivy
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.75.0 \
+            image \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 1 \
+            secure-calculator:${{ steps.version.outputs.version }}
 
       - name: Commit new version
         run: |
