@@ -71,7 +71,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build \
+          docker build --pull \
             -t secure-calculator:${{ steps.version.outputs.version }} \
             .
 
