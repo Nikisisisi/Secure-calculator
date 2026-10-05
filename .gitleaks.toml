@@ -1,0 +1,12 @@
+title = "Secure Calculator Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Ignore public GPG key fingerprints embedded in Trivy image metadata"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+regexes = ['''GPG_KEY=[A-F0-9]{40}''']
+paths = ['''^reports/trivy-image-.*\.json$''']
