@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 VERSION_FILE = Path(__file__).parent.parent / "VERSION"
@@ -25,6 +25,18 @@ app = FastAPI(
 class CalculationRequest(BaseModel):
     a: float
     b: float
+
+
+class PowerRequest(BaseModel):
+    a: float = Field(
+        ge=-1_000_000,
+        le=1_000_000
+    )
+
+    b: int = Field(
+        ge=-20,
+        le=20
+    )
 
 
 @app.get("/")
@@ -73,5 +85,11 @@ def divide(data: CalculationRequest):
 
 
 @app.post("/calculate/power")
-def power(data: CalculationRequest):
+def power(data: PowerRequest):
+    if data.a == 0 and data.b < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Zero cannot be raised to a negative power"
+        )
+
     return {"result": data.a ** data.b}

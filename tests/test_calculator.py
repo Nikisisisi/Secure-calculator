@@ -117,3 +117,54 @@ def test_power():
 
     assert response.status_code == 200
     assert response.json() == {"result": 8}
+
+
+def test_power_exponent_too_large():
+    response = client.post(
+        "/calculate/power",
+        json={
+            "a": 2,
+            "b": 1000000
+        }
+    )
+
+    assert response.status_code == 422
+
+
+def test_power_exponent_too_small():
+    response = client.post(
+        "/calculate/power",
+        json={
+            "a": 2,
+            "b": -1000000
+        }
+    )
+
+    assert response.status_code == 422
+
+
+def test_power_fractional_exponent_rejected():
+    response = client.post(
+        "/calculate/power",
+        json={
+            "a": 2,
+            "b": 2.5
+        }
+    )
+
+    assert response.status_code == 422
+
+
+def test_zero_negative_power_rejected():
+    response = client.post(
+        "/calculate/power",
+        json={
+            "a": 0,
+            "b": -1
+        }
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Zero cannot be raised to a negative power"
+    }

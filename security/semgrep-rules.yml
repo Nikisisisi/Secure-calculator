@@ -1,0 +1,28 @@
+rules:
+  - id: calculator-unbounded-power-operation
+    message: >
+      Power endpoint uses generic CalculationRequest without bounds
+      for the exponent. Use a dedicated validated request model with
+      a bounded integer exponent.
+    severity: WARNING
+
+    languages:
+      - python
+
+    metadata:
+      category: security
+      technology:
+        - fastapi
+      cwe:
+        - "CWE-400: Uncontrolled Resource Consumption"
+      owasp:
+        - "API4:2023 Unrestricted Resource Consumption"
+      project: secure-calculator
+
+    patterns:
+      - pattern-inside: |
+          @app.post("/calculate/power")
+          def $FUNC($DATA: CalculationRequest):
+              ...
+
+      - pattern: $DATA.a ** $DATA.b
