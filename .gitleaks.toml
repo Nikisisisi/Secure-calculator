@@ -10,3 +10,11 @@ condition = "AND"
 regexTarget = "line"
 regexes = ['''GPG_KEY=[A-F0-9]{40}''']
 paths = ['''^reports/trivy-image-.*\.json$''']
+
+[[allowlists]]
+description = "Ignore documented public GPG key fingerprint in security analysis"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+regexes = ['''GPG_KEY=[A-F0-9]{40}''']
+paths = ['''^docs/SECURITY_ANALYSIS\.md$''']
