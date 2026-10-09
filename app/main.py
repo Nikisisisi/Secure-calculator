@@ -39,6 +39,13 @@ class PowerRequest(BaseModel):
     )
 
 
+class FactorialRequest(BaseModel):
+    n: int = Field(
+        ge=0,
+        le=100,
+        strict=True
+    )
+
 @app.get("/")
 def root():
     return {
@@ -93,3 +100,13 @@ def power(data: PowerRequest):
         )
 
     return {"result": data.a ** data.b}
+
+
+@app.post("/calculate/factorial")
+def factorial(data: FactorialRequest):
+    result = 1
+
+    for number in range(2, data.n + 1):
+        result *= number
+
+    return {"result": result}

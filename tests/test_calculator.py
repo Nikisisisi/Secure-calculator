@@ -168,3 +168,45 @@ def test_zero_negative_power_rejected():
     assert response.json() == {
         "detail": "Zero cannot be raised to a negative power"
     }
+
+
+def test_factorial():
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": 5}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"result": 120}
+
+
+def test_factorial_zero():
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": 0}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"result": 1}
+
+
+def test_factorial_negative_rejected():
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": -1}
+    )
+    assert response.status_code == 422
+
+
+def test_factorial_too_large_rejected():
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": 101}
+    )
+    assert response.status_code == 422
+
+
+def test_factorial_fractional_rejected():
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": 5.5}
+    )
+    assert response.status_code == 422

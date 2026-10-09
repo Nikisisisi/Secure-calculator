@@ -26,3 +26,31 @@ rules:
               ...
 
       - pattern: $DATA.a ** $DATA.b
+
+  - id: calculator-unbounded-factorial-operation
+    message: >
+      Factorial endpoint must use a dedicated FactorialRequest
+      model with strict integer validation and an upper bound.
+    severity: WARNING
+
+    languages:
+      - python
+
+    metadata:
+      category: security
+      cwe:
+        - "CWE-400: Uncontrolled Resource Consumption"
+      project: secure-calculator
+
+    patterns:
+      - pattern-inside: |
+          @app.post("/calculate/factorial")
+          def $FUNC($DATA: $MODEL):
+              ...
+
+      - pattern-not-inside: |
+          @app.post("/calculate/factorial")
+          def $FUNC($DATA: FactorialRequest):
+              ...
+
+      - pattern: $DATA.n
