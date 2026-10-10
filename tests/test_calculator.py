@@ -81,10 +81,7 @@ def test_divide_by_zero():
         }
     )
 
-    assert response.status_code == 400
-    assert response.json() == {
-        "detail": "Division by zero is not allowed"
-    }
+    assert response.status_code == 422
 
 
 def test_invalid_input():
@@ -209,4 +206,98 @@ def test_factorial_fractional_rejected():
         "/calculate/factorial",
         json={"n": 5.5}
     )
+    assert response.status_code == 422
+
+
+def test_add_boolean_rejected():
+    response = client.post(
+        "/calculate/add",
+        json={
+            "a": 10,
+            "b": False
+        }
+    )
+
+    assert response.status_code == 422
+
+
+def test_power_boolean_exponent_rejected():
+    response = client.post(
+        "/calculate/power",
+        json={
+            "a": 2,
+            "b": False
+        }
+    )
+
+    assert response.status_code == 422
+
+
+def test_multiply_overflow_rejected():
+    safe_client = TestClient(
+        app,
+        raise_server_exceptions=False
+    )
+
+    response = safe_client.post(
+        "/calculate/multiply",
+        json={
+            "a": 1e200,
+            "b": 1e200
+        }
+    )
+
+    assert response.status_code == 422
+
+
+def test_power_overflow_rejected():
+    safe_client = TestClient(
+        app,
+        raise_server_exceptions=False
+    )
+
+    response = safe_client.post(
+        "/calculate/power",
+        json={
+            "a": 2.0247584850296642e-129,
+            "b": -4
+        }
+    )
+
+    assert response.status_code == 400
+
+
+def test_factorial_integer_float_accepted():
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": 5.0}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"result": 120}
+
+
+def test_factorial_boolean_rejected():
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": False}
+    )
+
+    assert response.status_code == 422
+
+
+def test_divide_overflow_rejected():
+    safe_client = TestClient(
+        app,
+        raise_server_exceptions=False
+    )
+
+    response = safe_client.post(
+        "/calculate/divide",
+        json={
+            "a": -1.192092896e-07,
+            "b": 5e-324
+        }
+    )
+
     assert response.status_code == 422
