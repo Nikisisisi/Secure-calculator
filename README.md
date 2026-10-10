@@ -393,7 +393,7 @@ POST /calculate/power
 Текущая версия приложения:
 
 <!-- VERSION:START -->
-`1.0.6`
+`1.0.7`
 <!-- VERSION:END -->
 
 ---
