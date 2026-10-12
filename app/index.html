@@ -6,104 +6,7 @@
 
     <title>Secure Calculator</title>
 
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            font-family: Arial, sans-serif;
-
-            background: linear-gradient(
-                135deg,
-                #0f172a,
-                #1e293b,
-                #0f766e
-            );
-
-            color: white;
-        }
-
-        .calculator {
-            width: 360px;
-
-            padding: 35px;
-
-            border-radius: 20px;
-
-            background: rgba(255, 255, 255, 0.10);
-
-            backdrop-filter: blur(10px);
-
-            box-shadow:
-                0 20px 50px rgba(0, 0, 0, 0.5);
-
-            text-align: center;
-        }
-
-        h1 {
-            margin-top: 0;
-        }
-
-        .author {
-            opacity: 0.8;
-            margin-bottom: 25px;
-        }
-
-        input {
-            box-sizing: border-box;
-
-            width: 100%;
-
-            margin-top: 10px;
-
-            padding: 12px;
-
-            border: none;
-            border-radius: 10px;
-
-            font-size: 16px;
-        }
-
-        .buttons {
-            margin-top: 20px;
-        }
-
-        button {
-            width: 60px;
-            height: 45px;
-
-            margin: 5px;
-
-            border: none;
-            border-radius: 10px;
-
-            font-size: 20px;
-
-            cursor: pointer;
-        }
-
-        button:hover {
-            transform: scale(1.08);
-        }
-
-        #result {
-            margin-top: 25px;
-
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .version {
-            margin-top: 25px;
-
-            font-size: 13px;
-            opacity: 0.6;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 
 
@@ -133,31 +36,31 @@
 
     <div class="buttons">
 
-        <button onclick="calculate('add')">
-            +
-        </button>
+    <button type="button" data-operation="add">
+        +
+    </button>
 
-        <button onclick="calculate('subtract')">
-            −
-        </button>
+    <button type="button" data-operation="subtract">
+        −
+    </button>
 
-        <button onclick="calculate('multiply')">
-            ×
-        </button>
+    <button type="button" data-operation="multiply">
+        ×
+    </button>
 
-        <button onclick="calculate('divide')">
-            ÷
-        </button>
+    <button type="button" data-operation="divide">
+        ÷
+    </button>
 
-        <button onclick="calculate('power')">
-            ^
-        </button>
+    <button type="button" data-operation="power">
+        ^
+    </button>
 
-         <button onclick="calculate('factorial')">
-            !
-         </button>
+    <button type="button" data-operation="factorial">
+        !
+    </button>
 
-    </div>
+</div>
 
     <div id="result">
         Результат: —
@@ -170,68 +73,7 @@
 </div>
 
 
-<script>
-
-async function calculate(operation) {
-
-    const a =
-        Number(document.getElementById("a").value);
-
-    const b =
-        Number(document.getElementById("b").value);
-
-    const requestBody =
-    operation === "factorial"
-        ? { n: a }
-        : { a: a, b: b };
-
-
-    const response = await fetch(
-        `/calculate/${operation}`,
-        {
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify(requestBody)
-        }
-    );
-
-
-    const data = await response.json();
-
-
-    if (response.ok) {
-
-        document.getElementById("result").textContent =
-            "Результат: " + data.result;
-
-    } else {
-
-    const errorMessage =
-        Array.isArray(data.detail)
-            ? data.detail.map(error => error.msg).join("; ")
-            : data.detail;
-
-    document.getElementById("result").textContent =
-        "Ошибка: " + errorMessage;
-
-    }
-}
-async function loadVersion() {
-
-    const response = await fetch("/");
-    const data = await response.json();
-
-    document.getElementById("version").textContent =
-        "Secure Calculator API v" + data.version;
-}
-
-
-loadVersion();
-</script>
+<script src="/static/script.js"></script>
 
 </body>
 

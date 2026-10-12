@@ -51,6 +51,31 @@ jobs:
             run http://127.0.0.1:8000/openapi.json \
             --wait-for-schema 30
 
+      - name: Run OWASP ZAP API security scan
+        run: |
+          python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 > zap-uvicorn.log 2>&1 &
+          API_PID=$!
+          trap 'kill "$API_PID" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:8000/openapi.json; then
+              break
+            fi
+            echo "Waiting for API (attempt $attempt/30)..."
+            sleep 1
+          done
+
+          curl --fail --silent --output /dev/null http://127.0.0.1:8000/openapi.json || { cat zap-uvicorn.log; exit 1; }
+
+          docker run --rm \
+            --network host \
+            -v "$GITHUB_WORKSPACE/security:/zap/wrk:ro" \
+            zaproxy/zap-stable:2.17.0 \
+            zap-api-scan.py \
+            -t http://127.0.0.1:8000/openapi.json \
+            -f openapi \
+            -c zap-rules.conf
+
       - name: Install pip-audit
         run: python -m pip install pip-audit==2.10.1
 
@@ -86,6 +111,29 @@ jobs:
           docker build --pull \
             -t secure-calculator:${{ steps.version.outputs.version }} \
             .
+
+      - name: Generate CycloneDX SBOM with Syft
+        run: |
+          mkdir -p sbom
+
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock:ro \
+            -v "$GITHUB_WORKSPACE/sbom:/out" \
+            ghcr.io/anchore/syft:v1.54.1 \
+            docker:secure-calculator:${{ steps.version.outputs.version }} \
+            -o cyclonedx-json=/out/secure-calculator-sbom.cdx.json
+
+          test -s sbom/secure-calculator-sbom.cdx.json
+
+          python -c "import json; d=json.load(open('sbom/secure-calculator-sbom.cdx.json')); assert d['bomFormat']=='CycloneDX'; assert d.get('components'); print('SBOM components:', len(d['components']))"
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: secure-calculator-sbom-${{ steps.version.outputs.version }}
+          path: sbom/secure-calculator-sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Scan Docker image with Trivy
         run: |

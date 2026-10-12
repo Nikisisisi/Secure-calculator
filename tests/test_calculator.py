@@ -301,3 +301,38 @@ def test_divide_overflow_rejected():
     )
 
     assert response.status_code == 422
+
+
+def test_global_security_headers():
+    response = client.get("/health")
+
+    assert response.headers.get("x-content-type-options") == "nosniff"
+    assert (
+        response.headers.get("cross-origin-resource-policy")
+        == "same-origin"
+    )
+
+
+def test_web_security_headers():
+    response = client.get("/web")
+
+    assert response.headers.get("x-frame-options") == "DENY"
+    assert (
+        response.headers.get("permissions-policy")
+        == "camera=(), microphone=(), geolocation=()"
+    )
+    assert (
+        response.headers.get("cross-origin-embedder-policy")
+        == "require-corp"
+    )
+    assert (
+        response.headers.get("cross-origin-opener-policy")
+        == "same-origin"
+    )
+
+    csp = response.headers.get("content-security-policy")
+
+    assert csp is not None
+    assert "script-src 'self'" in csp
+    assert "style-src 'self'" in csp
+    assert "'unsafe-inline'" not in csp
