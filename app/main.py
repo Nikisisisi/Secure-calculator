@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 VERSION_FILE = Path(__file__).parent.parent / "VERSION"
@@ -117,7 +117,7 @@ class PowerRequest(BaseModel):
         json_schema_extra={
             "not": {
                 "properties": {
-                    "a": {"const": 0},
+                    "a": {"exclusiveMinimum": -1e-15, "exclusiveMaximum": 1e-15},
                     "b": {"maximum": -1}
                 },
                 "required": ["a", "b"]
@@ -142,6 +142,14 @@ class PowerRequest(BaseModel):
         if isinstance(value, bool):
             raise ValueError("Boolean values are not allowed")
         return value
+
+    @model_validator(mode="after")
+    def reject_unsafe_negative_power(self):
+        if self.b < 0 and abs(self.a) < 1e-15:
+            raise ValueError(
+                "Negative powers require |a| >= 1e-15"
+            )
+        return self
 
 
 class FactorialRequest(BaseModel):
@@ -250,12 +258,6 @@ def divide(data: DivideRequest):
     responses=BAD_REQUEST_RESPONSES
 )
 def power(data: PowerRequest):
-    if data.a == 0 and data.b < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="Zero cannot be raised to a negative power"
-        )
-
     try:
         result = data.a ** data.b
     except OverflowError:

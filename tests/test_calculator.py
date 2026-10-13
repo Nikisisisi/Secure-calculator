@@ -161,10 +161,7 @@ def test_zero_negative_power_rejected():
         }
     )
 
-    assert response.status_code == 400
-    assert response.json() == {
-        "detail": "Zero cannot be raised to a negative power"
-    }
+    assert response.status_code == 422
 
 
 def test_factorial():
@@ -256,15 +253,18 @@ def test_power_overflow_rejected():
         raise_server_exceptions=False
     )
 
-    response = safe_client.post(
-        "/calculate/power",
-        json={
-            "a": 2.0247584850296642e-129,
-            "b": -4
-        }
-    )
+    for a, b in [(2.0247584850296642e-129, -4), (5e-324, -1)]:
+        response = safe_client.post(
+            "/calculate/power",
+            json={"a": a, "b": b}
+        )
+        assert response.status_code == 422
 
-    assert response.status_code == 400
+    schema = app.openapi()["components"]["schemas"]["PowerRequest"]
+    assert schema["not"]["properties"]["a"] == {
+        "exclusiveMinimum": -1e-15,
+        "exclusiveMaximum": 1e-15
+    }
 
 
 def test_factorial_integer_float_accepted():
