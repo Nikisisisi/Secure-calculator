@@ -550,5 +550,5 @@ MAJOR.MINOR.PATCH
 Текущая версия приложения:
 
 <!-- VERSION:START -->
-`1.0.10`
+`1.0.11`
 <!-- VERSION:END -->
