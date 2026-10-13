@@ -6,10 +6,15 @@ async function calculate(operation) {
     const b =
         Number(document.getElementById("b").value);
 
-    const requestBody =
-    operation === "factorial"
-        ? { n: a }
-        : { a: a, b: b };
+        let requestBody;
+
+    if (operation === "factorial") {
+        requestBody = { n: a };
+    } else if (operation === "sqrt") {
+        requestBody = { a: a };
+    } else {
+        requestBody = { a: a, b: b };
+    }
 
 
     const response = await fetch(
@@ -58,6 +63,26 @@ async function loadVersion() {
 document.querySelectorAll("[data-operation]").forEach((button) => {
     button.addEventListener("click", () => {
         calculate(button.dataset.operation);
+    });
+});
+
+let activeInput = document.getElementById("a");
+
+document.querySelectorAll("#a, #b").forEach((input) => {
+    input.addEventListener("focus", () => {
+        activeInput = input;
+    });
+});
+
+document.querySelectorAll("[data-constant]").forEach((button) => {
+    button.addEventListener("click", () => {
+        const value =
+            button.dataset.constant === "pi"
+                ? Math.PI
+                : Math.E;
+
+        activeInput.value = String(value);
+        activeInput.focus();
     });
 });
 

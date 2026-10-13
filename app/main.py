@@ -161,6 +161,25 @@ class FactorialRequest(BaseModel):
 
         return value
 
+
+class SqrtRequest(BaseModel):
+    a: float = Field(
+        ge=0,
+        le=1_000_000,
+        allow_inf_nan=False
+    )
+
+    @field_validator("a", mode="before")
+    @classmethod
+    def reject_invalid_types(cls, value):
+        if isinstance(value, bool):
+            raise ValueError("Boolean values are not allowed")
+
+        if not isinstance(value, (int, float)):
+            raise ValueError("Only numeric values are allowed")
+
+        return value
+
 @app.get("/")
 def root():
     return {
@@ -258,5 +277,15 @@ def factorial(data: FactorialRequest):
 
     for number in range(2, data.n + 1):
         result *= number
+
+    return {"result": result}
+
+
+@app.post(
+    "/calculate/sqrt",
+    responses=BAD_REQUEST_RESPONSES
+)
+def sqrt(data: SqrtRequest):
+    result = math.sqrt(data.a)
 
     return {"result": result}

@@ -336,3 +336,54 @@ def test_web_security_headers():
     assert "script-src 'self'" in csp
     assert "style-src 'self'" in csp
     assert "'unsafe-inline'" not in csp
+
+def test_sqrt():
+    response = client.post(
+        "/calculate/sqrt",
+        json={"a": 25}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"result": 5.0}
+
+
+def test_sqrt_rejects_invalid_input():
+    invalid_values = [
+        -9,
+        -0.01,
+        1_000_001,
+        True,
+        False,
+        "25",
+        None,
+        [],
+        {},
+    ]
+
+    for value in invalid_values:
+        response = client.post(
+            "/calculate/sqrt",
+            json={"a": value},
+        )
+
+        assert response.status_code == 422, (
+            f"Expected 422 for {value!r}, "
+            f"got {response.status_code}"
+        )
+
+
+def test_sqrt_boundary_values():
+    test_cases = [
+        (0, 0.0),
+        (1, 1.0),
+        (1_000_000, 1000.0),
+    ]
+
+    for value, expected in test_cases:
+        response = client.post(
+            "/calculate/sqrt",
+            json={"a": value},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"result": expected}
