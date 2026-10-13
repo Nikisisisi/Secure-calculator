@@ -41,14 +41,14 @@ jobs:
 
       - name: Run Schemathesis API security tests
         run: |
-          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8001 > uvicorn.log 2>&1 &
           API_PID=$!
           trap 'kill "$API_PID" 2>/dev/null || true' EXIT
 
           docker run --rm \
             --network host \
             schemathesis/schemathesis:4.30.0 \
-            run http://127.0.0.1:8000/openapi.json \
+            run http://127.0.0.1:8001/openapi.json \
             --wait-for-schema 30
 
       - name: Run OWASP ZAP API security scan
