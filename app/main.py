@@ -266,8 +266,6 @@ def power(data: PowerRequest):
 
     return {"result": result}
 
-
-
 @app.post(
     "/calculate/factorial",
     responses=BAD_REQUEST_RESPONSES
@@ -278,8 +276,10 @@ def factorial(data: FactorialRequest):
     for number in range(2, data.n + 1):
         result *= number
 
-    return {"result": result}
-
+    return {
+        "result": result,
+        "result_exact": str(result)
+    }
 
 @app.post(
     "/calculate/sqrt",

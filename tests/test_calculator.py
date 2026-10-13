@@ -172,8 +172,8 @@ def test_factorial():
         "/calculate/factorial",
         json={"n": 5}
     )
-    assert response.status_code == 200
-    assert response.json() == {"result": 120}
+    assert response.json()["result"] == 120
+    assert response.json()["result_exact"] == "120"
 
 
 def test_factorial_zero():
@@ -181,8 +181,8 @@ def test_factorial_zero():
         "/calculate/factorial",
         json={"n": 0}
     )
-    assert response.status_code == 200
-    assert response.json() == {"result": 1}
+    assert response.json()["result"] == 1
+    assert response.json()["result_exact"] == "1"
 
 
 def test_factorial_negative_rejected():
@@ -274,7 +274,8 @@ def test_factorial_integer_float_accepted():
     )
 
     assert response.status_code == 200
-    assert response.json() == {"result": 120}
+    assert response.json()["result"] == 120
+    assert response.json()["result_exact"] == "120"
 
 
 def test_factorial_boolean_rejected():
@@ -387,3 +388,14 @@ def test_sqrt_boundary_values():
 
         assert response.status_code == 200
         assert response.json() == {"result": expected}
+
+def test_factorial_100_exact():
+    import math
+
+    response = client.post(
+        "/calculate/factorial",
+        json={"n": 100}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["result_exact"] == str(math.factorial(100))

@@ -21,8 +21,7 @@ rules:
 
     patterns:
       - pattern-inside: |
-          @app.post("/calculate/power")
-          def $FUNC($DATA: CalculationRequest):
+          def power($DATA: CalculationRequest):
               ...
 
       - pattern: $DATA.a ** $DATA.b
@@ -44,13 +43,11 @@ rules:
 
     patterns:
       - pattern-inside: |
-          @app.post("/calculate/factorial")
-          def $FUNC($DATA: $MODEL):
+          def factorial($DATA: $MODEL):
               ...
 
       - pattern-not-inside: |
-          @app.post("/calculate/factorial")
-          def $FUNC($DATA: FactorialRequest):
+          def factorial($DATA: FactorialRequest):
               ...
 
       - pattern: $DATA.n

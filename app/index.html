@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Secure Calculator</title>
 
     <link rel="stylesheet" href="/static/styles.css">
@@ -20,12 +22,16 @@
         Автор: Обухов Н. и Лапшина Д.
     </div>
 
+<label for="a" class="sr-only">Первое число</label>
+
     <input
         id="a"
         type="number"
         step="any"
         placeholder="Первое число"
     >
+
+<label for="b" class="sr-only">Второе число</label>
 
     <input
         id="b"
@@ -74,7 +80,7 @@
 
 </div>
 
-    <div id="result">
+    <div id="result" aria-live="polite">
         Результат: —
     </div>
 

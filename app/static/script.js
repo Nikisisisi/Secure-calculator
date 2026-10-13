@@ -1,12 +1,27 @@
 async function calculate(operation) {
+    const resultElement = document.getElementById("result");
+    const aInput = document.getElementById("a");
+    const bInput = document.getElementById("b");
 
-    const a =
-        Number(document.getElementById("a").value);
+    const requiresB = operation !== "factorial" && operation !== "sqrt";
 
-    const b =
-        Number(document.getElementById("b").value);
+    const aText = aInput.value.trim();
+    const bText = bInput.value.trim();
 
-        let requestBody;
+    if (aText === "" || (requiresB && bText === "")) {
+        resultElement.textContent = "Ошибка: заполните необходимые поля.";
+        return;
+    }
+
+    const a = Number(aText);
+    const b = Number(bText);
+
+    if (!Number.isFinite(a) || (requiresB && !Number.isFinite(b))) {
+        resultElement.textContent = "Ошибка: введите корректные числа.";
+        return;
+    }
+
+    let requestBody;
 
     if (operation === "factorial") {
         requestBody = { n: a };
@@ -16,48 +31,54 @@ async function calculate(operation) {
         requestBody = { a: a, b: b };
     }
 
-
-    const response = await fetch(
-        `/calculate/${operation}`,
-        {
+    try {
+        const response = await fetch(`/calculate/${operation}`, {
             method: "POST",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const result = operation === "factorial"
+                && typeof data.result_exact === "string"
+                    ? data.result_exact
+                    : data.result;
+
+            resultElement.textContent = "Результат: " + result;
+        } else {
+
+            const errorMessage = Array.isArray(data.detail)
+                ? data.detail.map(error => error.msg).join("; ")
+                : (data.detail || "Неизвестная ошибка сервера");
+
+            resultElement.textContent = "Ошибка: " + errorMessage;
         }
-    );
-
-
-    const data = await response.json();
-
-
-    if (response.ok) {
-
-        document.getElementById("result").textContent =
-            "Результат: " + data.result;
-
-    } else {
-
-    const errorMessage =
-        Array.isArray(data.detail)
-            ? data.detail.map(error => error.msg).join("; ")
-            : data.detail;
-
-    document.getElementById("result").textContent =
-        "Ошибка: " + errorMessage;
-
+    } catch (error) {
+        resultElement.textContent =
+            "Ошибка: не удалось получить ответ сервера.";
     }
 }
 async function loadVersion() {
+    const versionElement = document.getElementById("version");
 
-    const response = await fetch("/");
-    const data = await response.json();
+    try {
+        const response = await fetch("/");
 
-    document.getElementById("version").textContent =
-        "Secure Calculator API v" + data.version;
+        if (!response.ok) {
+            throw new Error("Version request failed");
+        }
+
+        const data = await response.json();
+
+        versionElement.textContent =
+            "Secure Calculator API v" + data.version;
+    } catch (error) {
+        versionElement.textContent = "Версия API недоступна";
+    }
 }
 
 document.querySelectorAll("[data-operation]").forEach((button) => {
